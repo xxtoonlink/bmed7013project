@@ -9,6 +9,10 @@ from scipy.integrate import odeint
 pen = 0     # level of penetration inhibitor (Enfuvirtide) in the body, normalized 0 to 1
 pi = 0      # level of protease inhibitor (Ritonavir) in the body, normalized 0 to 1
 nrti = 0    # level of NRTI (Tenofovir) in the body, normalized 0 to 1
+res_all = (1 - nrti) * (1 - pen) * (1 - pi)
+res_nrti = (1 - pen) * (1 - pi)
+res_pen = (1 - nrti) * (1 - pi)
+res_pi = (1 - nrti) * (1 - pen)
 
 # T cell variables
 
@@ -91,19 +95,24 @@ def f(y, t):
     eqs = np.zeros((13))
 
     # T_u; dt T cells, uninfected
-    eqs[0] = P_t_u + ( r_t * T_u * ( 1 - ( T_tot ) / T_max ) ) - ( k_wt * V_wt * T_u ) - ( k_nrti * V_nrti * T_u ) - ( k_pi * V_pi * T_u ) - ( k_pen * V_pen * T_u )  - ( mu_tu * T_u )
+    eqs[0] = P_t_u + ( r_t * T_u * ( 1 - ( T_tot ) / T_max ) )
+    - ( k_wt * V_wt * T_u ) * res_all
+    - ( k_nrti * V_nrti * T_u ) * res_nrti
+    - ( k_pi * V_pi * T_u ) * res_pi
+    - ( k_pen * V_pen * T_u ) * res_pen
+    - ( mu_tu * T_u )
 
     # T_l_wt; dt T cells, latently infected, wildtype
-    eqs[1] = ( k_wt * V_wt * T_u ) - ( c_tl_wt * T_l_wt )
+    eqs[1] = ( k_wt * V_wt * T_u ) * res_all - ( c_tl_wt * T_l_wt )
 
     # T_l_nrti; dt T cells, latently infected, NRTI resistant strain
-    eqs[2] = ( k_nrti * V_nrti * T_u ) - ( c_tl_nrti * T_l_nrti )
+    eqs[2] = ( k_nrti * V_nrti * T_u ) * res_nrti - ( c_tl_nrti * T_l_nrti )
 
     # T_l_pen; dt T cells, latently infected, penetration-resistant strain
-    eqs[3] = ( k_pen * V_pen * T_u ) - ( c_tl_pen * T_l_pen )
+    eqs[3] = ( k_pen * V_pen * T_u ) * res_pen - ( c_tl_pen * T_l_pen )
 
     # T_l_pi; dt T cells, latently infected, protease-inhibitor resistant strain
-    eqs[4] = ( k_pi * V_pi * T_u ) - ( c_tl_pi * T_l_pi )
+    eqs[4] = ( k_pi * V_pi * T_u ) * res_pi - ( c_tl_pi * T_l_pi )
 
     # T_a_wt; dt T cells, actively infected, wildtype
     eqs[5] = ( c_tl_wt * T_l_wt) - ( N_wt * mu_ta_wt * T_a_wt )
