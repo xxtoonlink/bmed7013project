@@ -106,13 +106,13 @@ def f(y, t):
     eqs[1] = ( k_wt * V_wt * T_u ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( c_tl_wt * T_l_wt )
 
     # T_l_nrti; dt T cells, latently infected, NRTI resistant strain
-    eqs[2] = ( k_nrti * V_nrti * T_u ) * res_nrti - ( c_tl_nrti * T_l_nrti )
+    eqs[2] = ( k_nrti * V_nrti * T_u ) * (1 - pen) * (1 - pi) - ( c_tl_nrti * T_l_nrti )
 
     # T_l_pen; dt T cells, latently infected, penetration-resistant strain
-    eqs[3] = ( k_pen * V_pen * T_u ) * res_pen - ( c_tl_pen * T_l_pen )
+    eqs[3] = ( k_pen * V_pen * T_u ) * (1 - nrti) * (1 - pi) - ( c_tl_pen * T_l_pen )
 
     # T_l_pi; dt T cells, latently infected, protease-inhibitor resistant strain
-    eqs[4] = ( k_pi * V_pi * T_u ) * res_pi - ( c_tl_pi * T_l_pi )
+    eqs[4] = ( k_pi * V_pi * T_u ) * (1 - nrti) * (1 - pen) - ( c_tl_pi * T_l_pi )
 
     # T_a_wt; dt T cells, actively infected, wildtype
     eqs[5] = ( c_tl_wt * T_l_wt) - ( N_wt * mu_ta_wt * T_a_wt )
@@ -127,19 +127,19 @@ def f(y, t):
     eqs[8] = ( c_tl_pi * T_l_pi) - ( N_pi * mu_ta_pi * T_a_pi )
 
     # V_wt; dt HIV particles, wildtype
-    eqs[9] = ( ( N_wt * mu_ta_wt * T_a_wt ) - ( k_wt * V_wt * T_u ) ) * res_all - ( mu_v * V_wt )
+    eqs[9] = ( ( N_wt * mu_ta_wt * T_a_wt ) - ( k_wt * V_wt * T_u ) ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( mu_v * V_wt )
     - ( mut_nrti * V_wt ) - ( mut_pen * V_wt ) - ( mut_pi * V_wt ) - ( mut_f * V_wt )
 
     # V_nrti; dt HIV particles, NRTI resistant strain
-    eqs[10] = ( ( N_nrti * mu_ta_nrti * T_a_nrti ) - ( k_nrti * V_nrti * T_u ) ) * res_nrti - ( mu_v * V_nrti )
+    eqs[10] = ( ( N_nrti * mu_ta_nrti * T_a_nrti ) - ( k_nrti * V_nrti * T_u ) ) * (1 - pen) * (1 - pi) - ( mu_v * V_nrti )
     + ( mut_nrti * V_wt )
 
     # V_pen; dt HIV particles, penetration-resistant strain
-    eqs[11] = ( ( N_pen * mu_ta_pen * T_a_pen ) - ( k_pen * V_pen * T_u ) ) * res_pen - ( mu_v * V_pen )
+    eqs[11] = ( ( N_pen * mu_ta_pen * T_a_pen ) - ( k_pen * V_pen * T_u ) ) * (1 - nrti) * (1 - pi) - ( mu_v * V_pen )
     + ( mut_pen * V_wt )
 
     # V_pi; dt HIV particles, protease-inhibitor resistant strain
-    eqs[12] = ( ( N_pi * mu_ta_pi * T_a_pi ) - ( k_pi * V_pi * T_u ) ) * res_pi - ( mu_v * V_pi )
+    eqs[12] = ( ( N_pi * mu_ta_pi * T_a_pi ) - ( k_pi * V_pi * T_u ) ) * (1 - nrti) * (1 - pen) - ( mu_v * V_pi )
     + ( mut_pi * V_wt )
 
     return eqs
