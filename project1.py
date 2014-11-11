@@ -76,19 +76,19 @@ mut_f = 0.01        # rate of mutation, wildtype to failed substrain
 
 # solve the system dy/dt = f(y, t)
 def f(y, t):
-    # T_u = y[0]          # dt T cells, uninfected
-    # T_l_wt = y[1]       # dt T cells, latently infected, wildtype
-    # T_l_nrti = y[2]     # dt T cells, latently infected, NRTI resistant strain
-    # T_l_pen = y[3]      # dt T cells, latently infected, penetration-resistant strain
-    # T_l_pi = y[4]       # dt T cells, latently infected, protease-inhibitor resistant strain
-    # T_a_wt = y[5]       # dt T cells, actively infected, wildtype
-    # T_a_nrti = y[6]     # dt T cells, actively infected, NRTI resistant strain
-    # T_a_pen = y[7]      # dt T cells, actively infected, penetration-resistant strain
-    # T_a_pi = y[8]       # dt T cells, actively infected, protease-inhibitor resistant strain
-    # V_wt = y[9]         # dt HIV particles, wildtype
-    # V_nrti = y[10]      # dt HIV particles, NRTI resistant strain
-    # V_pen = y[11]       # dt HIV particles, penetration-resistant strain
-    # V_pi = y[12]        # dt HIV particles, protease-inhibitor resistant strain
+    T_u = y[0]          # dt T cells, uninfected
+    T_l_wt = y[1]       # dt T cells, latently infected, wildtype
+    T_l_nrti = y[2]     # dt T cells, latently infected, NRTI resistant strain
+    T_l_pen = y[3]      # dt T cells, latently infected, penetration-resistant strain
+    T_l_pi = y[4]       # dt T cells, latently infected, protease-inhibitor resistant strain
+    T_a_wt = y[5]       # dt T cells, actively infected, wildtype
+    T_a_nrti = y[6]     # dt T cells, actively infected, NRTI resistant strain
+    T_a_pen = y[7]      # dt T cells, actively infected, penetration-resistant strain
+    T_a_pi = y[8]       # dt T cells, actively infected, protease-inhibitor resistant strain
+    V_wt = y[9]         # dt HIV particles, wildtype
+    V_nrti = y[10]      # dt HIV particles, NRTI resistant strain
+    V_pen = y[11]       # dt HIV particles, penetration-resistant strain
+    V_pi = y[12]        # dt HIV particles, protease-inhibitor resistant strain
 
     # differential equations
 
@@ -103,7 +103,7 @@ def f(y, t):
     - ( mu_tu * T_u )
 
     # T_l_wt; dt T cells, latently infected, wildtype
-    eqs[1] = ( k_wt * V_wt * T_u ) * res_all - ( c_tl_wt * T_l_wt )
+    eqs[1] = ( k_wt * V_wt * T_u ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( c_tl_wt * T_l_wt )
 
     # T_l_nrti; dt T cells, latently infected, NRTI resistant strain
     eqs[2] = ( k_nrti * V_nrti * T_u ) * res_nrti - ( c_tl_nrti * T_l_nrti )
@@ -127,19 +127,19 @@ def f(y, t):
     eqs[8] = ( c_tl_pi * T_l_pi) - ( N_pi * mu_ta_pi * T_a_pi )
 
     # V_wt; dt HIV particles, wildtype
-    eqs[9] = ( ( N_wt * mu_ta_wt * T_a_wt ) - ( k_wt * V_wt * T_u ) ) * ( ( 1 - nrti ) * ( 1 - pen ) * ( 1 - pi ) ) - ( mu_v * V_wt )
+    eqs[9] = ( ( N_wt * mu_ta_wt * T_a_wt ) - ( k_wt * V_wt * T_u ) ) * res_all - ( mu_v * V_wt )
     - ( mut_nrti * V_wt ) - ( mut_pen * V_wt ) - ( mut_pi * V_wt ) - ( mut_f * V_wt )
 
     # V_nrti; dt HIV particles, NRTI resistant strain
-    eqs[10] = ( ( N_nrti * mu_ta_nrti * T_a_nrti ) - ( k_nrti * V_nrti * T_u ) ) * ( ( 1 - pen ) * ( 1 - pi ) ) - ( mu_v * V_nrti )
+    eqs[10] = ( ( N_nrti * mu_ta_nrti * T_a_nrti ) - ( k_nrti * V_nrti * T_u ) ) * res_nrti - ( mu_v * V_nrti )
     + ( mut_nrti * V_wt )
 
     # V_pen; dt HIV particles, penetration-resistant strain
-    eqs[11] = ( ( N_pen * mu_ta_pen * T_a_pen ) - ( k_pen * V_pen * T_u ) ) * ( ( 1 - nrti ) * ( 1 - pi ) ) - ( mu_v * V_pen )
+    eqs[11] = ( ( N_pen * mu_ta_pen * T_a_pen ) - ( k_pen * V_pen * T_u ) ) * res_pen - ( mu_v * V_pen )
     + ( mut_pen * V_wt )
 
     # V_pi; dt HIV particles, protease-inhibitor resistant strain
-    eqs[12] = ( ( N_pi * mu_ta_pi * T_a_pi ) - ( k_pi * V_pi * T_u ) ) * ( ( 1 - nrti ) * ( 1 - pen ) ) - ( mu_v * V_pi )
+    eqs[12] = ( ( N_pi * mu_ta_pi * T_a_pi ) - ( k_pi * V_pi * T_u ) ) * res_pi - ( mu_v * V_pi )
     + ( mut_pi * V_wt )
 
     return eqs
