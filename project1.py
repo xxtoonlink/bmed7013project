@@ -33,8 +33,8 @@ s_t = 20		# new production, fresh T cells
 r_t = 3		    # proliferation, T cells
 T_max = 1500	# max number of T cells
 
-mu_tu = 0.1         # rate of death, T cells, uninfected
-mu_wt = 0.25	    # rate of death, T cells, infected with wildtype HIV
+mu_tu = 0.1      # rate of death, T cells, uninfected
+mu_wt = 0.25	 # rate of death, T cells, infected with wildtype HIV
 mu_nrti = 0.25   # rate of death, T cells, infected with NRTI resistant HIV
 mu_pen = 0.25    # rate of death, T cells, infected with penetration-inhibitor resistant HIV
 mu_pi = 0.25     # rate of death, T cells, infected with protease-inhibitor resistantHIV
@@ -79,17 +79,17 @@ def f(y, t):
     - ( k_pen * V_pen * T_u ) * (1 - nrti) * (1 - pi)
     - ( mu_tu * T_u )
 
-    # T_wt; dt T cells, latently infected, wildtype
+    # T_wt; dt T cells, infected, wildtype
     eqs[1] = ( k_wt * V_wt * T_u ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( N_wt * mu_wt * T_wt )
 
-    # T_nrti; dt T cells, latently infected, NRTI resistant strain
-    eqs[2] = ( k_nrti * V_nrti * T_u ) * (1 - pen) * (1 - pi) - ( N_nrti * mu_nrti * T_nrti )
+    # T_nrti; dt T cells, infected, NRTI resistant strain
+    eqs[2] = ( k_nrti * V_nrti * T_u ) * (1 - pen) * (1 - pi) - ( mu_nrti * T_nrti )
 
-    # T_pen; dt T cells, latently infected, penetration-resistant strain
-    eqs[3] = ( k_pen * V_pen * T_u ) * (1 - nrti) * (1 - pi) - ( N_pen * mu_pen * T_pen )
+    # T_pen; dt T cells, infected, penetration-resistant strain
+    eqs[3] = ( k_pen * V_pen * T_u ) * (1 - nrti) * (1 - pi) - ( mu_pen * T_pen )
 
-    # T_pi; dt T cells, latently infected, protease-inhibitor resistant strain
-    eqs[4] = ( k_pi * V_pi * T_u ) * (1 - nrti) * (1 - pen) - ( N_pi * mu_pi * T_pi )
+    # T_pi; dt T cells, infected, protease-inhibitor resistant strain
+    eqs[4] = ( k_pi * V_pi * T_u ) * (1 - nrti) * (1 - pen) - ( mu_pi * T_pi )
 
     # V_wt; dt HIV particles, wildtype
     eqs[5] = ( ( N_wt * mu_wt * T_wt ) - ( k_wt * V_wt * T_u ) ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( mu_v * V_wt )
@@ -99,8 +99,7 @@ def f(y, t):
     eqs[6] = ( ( N_nrti * mu_nrti * T_nrti ) - ( k_nrti * V_nrti * T_u ) ) * (1 - pen) * (1 - pi) - ( mu_v * V_nrti ) + ( mut_nrti * V_wt )
 
     # V_pen; dt HIV particles, penetration-resistant strain
-    eqs[7] = ( ( N_pen * mu_pen * T_pen ) - ( k_pen * V_pen * T_u ) ) * (1 - nrti) * (1 - pi) - ( mu_v * V_pen )
-    + ( mut_pen * V_wt )
+    eqs[7] = ( ( N_pen * mu_pen * T_pen ) - ( k_pen * V_pen * T_u ) ) * (1 - nrti) * (1 - pi) - ( mu_v * V_pen ) + ( mut_pen * V_wt )
 
     # V_pi; dt HIV particles, protease-inhibitor resistant strain
     eqs[8] = ( ( N_pi * mu_pi * T_pi ) - ( k_pi * V_pi * T_u ) ) * (1 - nrti) * (1 - pen) - ( mu_v * V_pi ) + ( mut_pi * V_wt )
