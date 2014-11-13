@@ -31,7 +31,7 @@ k_nrti = 0.1    # rate of infection for uninfected wildtype T cells with NRTI re
 # T cell variables
 s_t = 20		# new production, fresh T cells
 r_t = 3		    # proliferation, T cells
-T_max = 1500	# max number of T cells
+T_max = 1000	# max number of T cells
 
 mu_tu = 0.1      # rate of death, T cells, uninfected
 mu_wt = 0.25	 # rate of death, T cells, infected with wildtype HIV
@@ -46,7 +46,7 @@ k_pen = 0.1	    # rate of infection for T cells with penetration-inhibitor resis
 k_pi = 0.1	    # rate of infection for T cells with protease-inhibitor resistant strain (T_u to T_pi)
 
 # virus variables
-N = 3.6e3	        # num of HIV particles produced by lysing a T cell
+N = 300	        # num of HIV particles produced by lysing a T cell
 mu_v = 5		    # rate of death, free virus
 mut_nrti = 0.001    # rate of mutation, wildtype to NRTI resistant HIV
 mut_pen = 0.001     # rate of mutation, wildtype to penetration-inhibitor resistant HIV
@@ -72,16 +72,10 @@ def f(y, t):
     V_pi = y[8]      # dt HIV particles, protease-inhibitor resistant strain
 
     # differential equations
+    eqs = np.zeros(9)
 
-    eqs = np.zeros((9))
-
-    # T_u; dt T cells, uninfected
-    eqs[0] = s_t + ( r_t * T_u * ( 1 - ( T_tot / T_max ) )
-    - ( k_wt * V_wt * T_u ) * (1 - nrti) * (1 - pen) * (1 - pi)
-    - ( k_nrti * V_nrti * T_u ) * (1 - pen) * (1 - pi)
-    - ( k_pi * V_pi * T_u ) * (1 - nrti) * (1 - pen)
-    - ( k_pen * V_pen * T_u ) * (1 - nrti) * (1 - pi)
-    - ( mu_tu * T_u )
+    # T_u; dt T cells, uninfected - SHOULD THIS TERM BE AFFECTED BY DRUG EFFICACY?
+    eqs[0] = s_t + r_t * T_u * ( 1 - ( T_tot / T_max ) ) - ( k_wt * V_wt * T_u ) * res_all - ( k_nrti * V_nrti * T_u ) * res_nrti - ( k_pi * V_pi * T_u ) * res_pi - ( k_pen * V_pen * T_u ) * res_pen - ( mu_tu * T_u )
 
     # T_wt; dt T cells, infected, wildtype
     eqs[1] = ( k_wt * V_wt * T_u ) * res_all - ( mu_wt * T_wt )
@@ -97,7 +91,7 @@ def f(y, t):
 
     # V_wt; dt HIV particles, wildtype
     eqs[5] = ( ( N * mu_wt * T_wt ) - ( k_wt * V_wt * T_u ) ) * (1 - nrti) * (1 - pen) * (1 - pi) - ( mu_v * V_wt )
-    - ( mut_nrti * V_wt ) - ( mut_pen * V_wt ) - ( mut_pi * V_wt ) - ( mut_f * V_wt )
+    - ( mut_nrti * V_wt ) - ( mut_pen * V_wt ) - ( mut_pi * V_wt )
 
     # V_nrti; dt HIV particles, NRTI resistant strain
     eqs[6] = ( ( N * mu_nrti * T_nrti ) - ( k_nrti * V_nrti * T_u ) ) * (1 - pen) * (1 - pi) - ( mu_v * V_nrti ) + ( mut_nrti * V_wt )
